@@ -1,0 +1,14 @@
+button{
+    font-weight: bold;
+    padding: 20px 20px 20px 20px;
+    border-radius: 10px;
+}
+#reg{
+    background-color: rgb(83, 83, 184);
+    color: white;
+    margin: 300px 0 0 600px;
+}
+#log{
+    background-color: white;
+    color: rgb(83, 83, 184);
+}

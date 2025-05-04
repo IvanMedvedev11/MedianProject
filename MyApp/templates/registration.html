@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+    <head>
+        <title>Регистрация</title>
+        <link rel="stylesheet" href="{% static "css/form.css" %}" />
+    </head>
+    <body>
+        <form method="post" action="/registration/">
+            {% csrf_token %}
+            <input name="login" type="text" placeholder="Введите логин">
+            <br>
+            <br>
+            <input name="password" type="password" placeholder="Введите пароль">
+            <br>
+            <br>
+            <button>Зарегистрироваться</button>
+            {% if state == False %}
+                <p>Пользователь уже существует</p>
+            {% endif %}
+        </form>
+    </body>
+</html>
