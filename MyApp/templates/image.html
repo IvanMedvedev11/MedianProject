@@ -3,16 +3,38 @@
 <html lang="ru">
     <head>
         <title>Картинки</title>
-        <link rel="stylesheet" href="{% static "css/image.css" %}"
+        <link rel="stylesheet" href="{% static "css/image.css" %}">
     </head>
     <body>
         <div class="flex-container">
-            {% for file, title, user in files_users%}
-                <figure clas="flex-item">
+            {% for file, title, user, likes, dislikes, avatar, comments in files_users%}
+                <figure class="flex-item" >
                     <img src="{% static "images/"|add:file %}" />
                     <figcaption>
-                        <h3>{{ title }}</h3>
-                        <p>{{ user }}</p>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input id="react" type="submit" name="like" value="👍 {{ likes }}">
+                            <input type="hidden" name="name" value="{{ file }}">
+                            <input id="react" type="submit" name="dislike" value="👎 {{ dislikes }}">
+                            <input type="hidden" name="image" value="{{ file }}">
+                        </form>
+                        <h2>{{ title }}</h2>
+                        <p class="user"><img class="avatar" src="{% static "avatars/"|add:avatar %}" height="20px" width="20px">{{ user }}</p>
+                        <details>
+                            <summary>Комментарии</summary>
+                            <div>
+                                {% for comment, commentator in comments %}
+                                    <h4>{{ commentator }}</h4>
+                                    {{ comment }}
+                                {% endfor %}
+                                <form method ='post'>
+                                    {% csrf_token %}
+                                    <input type="text" name="comment" placeholder="Добавить комментарий">
+                                    <input type="hidden" name="image" value="{{ file }}">
+                                    <button>Отправить комментарий</button>
+                                </form>
+                            </div>
+                        </details>
                     </figcaption>
                 </figure>
             {% endfor %}
@@ -25,8 +47,11 @@
             <input type="text" name="title" placeholder="Введите название картинки">
             <button>Добавить картинку</button>
         </form>
-        <form id="form2" action="/your_images/">
+        <form class="form2" action="/your_images/">
             <button>Мои картинки</button>
+        </form>
+        <form class="form2" action="/">
+            <button>Выход</button>
         </form>
     </body>
 </html>

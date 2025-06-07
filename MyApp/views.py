@@ -25,7 +25,9 @@ def registration(request):
                 user = request.POST.get("login")
                 state = True
                 password = hashlib.sha256(request.POST.get("password").encode()).hexdigest()
-                cursor.execute("INSERT INTO MyApp_person (login, password) VALUES (%s, %s)", [request.POST.get("login"), password])
+                fs = FileSystemStorage(location='MyApp/static/avatars')
+                fs.save(request.FILES['avatar'].name, request.FILES['avatar'])
+                cursor.execute("INSERT INTO MyApp_person (login, password, avatar) VALUES (%s, %s, %s)", [request.POST.get("login"), password, request.FILES['avatar'].name])
                 return HttpResponseRedirect('/image/')
     return render(request, "registration.html")
 def login(request):
@@ -51,14 +53,31 @@ def image(request):
         return HttpResponseForbidden("Вы не авторизованы")
     data = {"files_users": []}
     if request.method == "POST":
-        fs = FileSystemStorage(location='MyApp/static/images')
-        filename = fs.save(request.FILES['image'].name, request.FILES['image'])
-        with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO MyApp_images (name, user, title) VALUES(%s, %s, %s)", [request.FILES['image'].name, user, request.POST.get('title')])
+        if request.POST.get("title"):
+            fs = FileSystemStorage(location='MyApp/static/images')
+            filename = fs.save(request.FILES['image'].name, request.FILES['image'])
+            with connection.cursor() as cursor:
+                cursor.execute("INSERT INTO MyApp_images (name, user, title, likes, dislikes) VALUES(%s, %s, %s, %s, %s)", [request.FILES['image'].name, user, request.POST.get('title'), 0, 0])
+        elif request.POST.get("like"):
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE MyApp_images SET likes = likes + 1 WHERE name=%s", [request.POST.get("name")])
+        elif request.POST.get('dislike'):
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE MyApp_images SET dislikes = dislikes + 1 WHERE name=%s", [request.POST.get("name")])
+        else:
+            with connection.cursor() as cursor:
+                cursor.execute("INSERT INTO MyApp_comments (comment, image, user) VALUES (%s, %s, %s)", [request.POST.get("comment"), request.POST.get("image"), user])
     with connection.cursor() as cursor:
-        cursor.execute("SELECT DISTINCT name, title, user from MyApp_images")
+        cursor.execute("SELECT DISTINCT name, title, user, likes, dislikes from MyApp_images ORDER BY (likes - dislikes) DESC")
         files = cursor.fetchall()
-        data['files_users'] = zip(list(map(lambda x: x[0], files)), list(map(lambda x: x[1], files)), list(map(lambda x: x[2], files)))
+        cursor.execute('SELECT avatar, user FROM MyApp_person INNER JOIN MyApp_images ON MyApp_person.login = MyApp_images.user')
+        avatar = cursor.fetchall()
+        all_comments = []
+        for image in list(map(lambda x: x[0], files)):
+            cursor.execute('SELECT comment, user FROM MyApp_comments WHERE image=%s', [image])
+            comments = cursor.fetchall()
+            all_comments.append(zip(list(map(lambda x: x[0], comments)), list(map(lambda x: x[1], comments))))
+        data['files_users'] = zip(list(map(lambda x: x[0], files)), list(map(lambda x: x[1], files)), list(map(lambda x: x[2], files)), list(map(lambda x: x[3], files)), list(map(lambda x: x[4], files)), list(map(lambda x: x[0], avatar)), all_comments)
     return render(request, "image.html", context=data)
 # Create your views here.
 def your_images(request):
@@ -70,7 +89,11 @@ def your_images(request):
     if request.method == "POST":
         with connection.cursor() as cursor:
             img = request.POST.get("image")
+            cursor.execute('SELECT DISTINCT name FROM MyApp_images WHERE title=%s', [img])
+            name = cursor.fetchone()
+            print(name)
             cursor.execute("DELETE FROM MyApp_images WHERE title=%s", [img])
+            cursor.execute("DELETE FROM MyApp_comments WHERE image=%s", [name[0]])
     with connection.cursor() as cursor:
         cursor.execute("SELECT DISTINCT name, title FROM MyApp_images WHERE user=%s", [user])
         images = cursor.fetchall()

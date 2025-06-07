@@ -1,7 +1,17 @@
 #form{
     margin: 300px 0 0 600px;
 }
-#form2{
+#react{
+    background-color: white;
+    border-radius: 5px
+}
+.user{
+    font-size: 24px;
+}
+.avatar{
+    border-radius: 10px;
+}
+.form2{
     margin: 10px 0 0 650px;
 }
 .flex-container{
@@ -12,6 +22,14 @@
 figcaption{
     font-weight: bold;
     color: rgb(83, 83, 184);
+}
+div{
+    color: black;
+    font-weight: normal
+}
+h4{
+    color: rgb(83, 83, 184);
+    font-weight: bold;
 }
 button{
     font-weight: bold;
