@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+    <head>
+        <title>Ваши картинки</title>
+        <link rel="stylesheet" href="{% static "css/image.css" %}"
+    </head>
+    <body>
+        <div class="flex-container">
+            {% for file, title in files%}
+                <figure clas="flex-item">
+                    <img src="{% static "images/"|add:file %}" />
+                    <figcaption>{{ title }}</figcaption>
+                </figure>
+            {% endfor %}
+        </div>
+        <form id="form" method="post">
+            {% csrf_token %}
+            <input type="text" name="image" placeholder="Введите название картинки">
+            <button>Удалить картинку</button>
+        </form>
+        <form id="form2" action="/image/">
+            <button>Вернуться на главную</button>
+        </form>
+    </body>
+</html>

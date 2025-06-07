@@ -22,4 +22,5 @@ urlpatterns = [
     path('registration/', views.registration),
     path('login/', views.login),
     path('image/', views.image),
+    path('your_images/', views.your_images)
 ]

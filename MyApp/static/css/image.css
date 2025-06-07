@@ -1,0 +1,21 @@
+#form{
+    margin: 300px 0 0 600px;
+}
+#form2{
+    margin: 10px 0 0 650px;
+}
+.flex-container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+figcaption{
+    font-weight: bold;
+    color: rgb(83, 83, 184);
+}
+button{
+    font-weight: bold;
+    background-color: rgb(83, 83, 184);
+    color: white;
+    border-radius: 5px;
+}

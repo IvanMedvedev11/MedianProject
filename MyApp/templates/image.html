@@ -2,9 +2,31 @@
 {% load static %}
 <html lang="ru">
     <head>
-        <title>Картинка</title>
+        <title>Картинки</title>
+        <link rel="stylesheet" href="{% static "css/image.css" %}"
     </head>
     <body>
-        <img src="{% static "images/beluga.png" %}" />
+        <div class="flex-container">
+            {% for file, title, user in files_users%}
+                <figure clas="flex-item">
+                    <img src="{% static "images/"|add:file %}" />
+                    <figcaption>
+                        <h3>{{ title }}</h3>
+                        <p>{{ user }}</p>
+                    </figcaption>
+                </figure>
+            {% endfor %}
+        </div>
+        <form id="form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="image" accept="image/*">
+            <br>
+            <br>
+            <input type="text" name="title" placeholder="Введите название картинки">
+            <button>Добавить картинку</button>
+        </form>
+        <form id="form2" action="/your_images/">
+            <button>Мои картинки</button>
+        </form>
     </body>
 </html>
