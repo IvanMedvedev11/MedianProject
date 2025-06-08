@@ -9,7 +9,7 @@
         <div class="flex-container">
             {% for file, title, user, likes, dislikes, avatar, comments in files_users%}
                 <figure class="flex-item" >
-                    <img src="{% static "images/"|add:file %}" />
+                    <img src="{{ MEDIA_URL }}{{ file }}" />
                     <figcaption>
                         <form method="post">
                             {% csrf_token %}
@@ -19,7 +19,7 @@
                             <input type="hidden" name="image" value="{{ file }}">
                         </form>
                         <h2>{{ title }}</h2>
-                        <p class="user"><img class="avatar" src="{% static "avatars/"|add:avatar %}" height="20px" width="20px">{{ user }}</p>
+                        <p class="user"><img class="avatar" src="{{ MEDIA_URL }}{{ avatar }}" height="20px" width="20px">{{ user }}</p>
                         <details>
                             <summary>Комментарии</summary>
                             <div>

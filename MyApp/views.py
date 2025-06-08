@@ -25,7 +25,7 @@ def registration(request):
                 user = request.POST.get("login")
                 state = True
                 password = hashlib.sha256(request.POST.get("password").encode()).hexdigest()
-                fs = FileSystemStorage(location='MyApp/static/avatars')
+                fs = FileSystemStorage(location='media/avatars')
                 fs.save(request.FILES['avatar'].name, request.FILES['avatar'])
                 cursor.execute("INSERT INTO MyApp_person (login, password, avatar) VALUES (%s, %s, %s)", [request.POST.get("login"), password, request.FILES['avatar'].name])
                 return HttpResponseRedirect('/image/')
@@ -54,7 +54,7 @@ def image(request):
     data = {"files_users": []}
     if request.method == "POST":
         if request.POST.get("title"):
-            fs = FileSystemStorage(location='MyApp/static/images')
+            fs = FileSystemStorage(location='media/images')
             filename = fs.save(request.FILES['image'].name, request.FILES['image'])
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO MyApp_images (name, user, title, likes, dislikes) VALUES(%s, %s, %s, %s, %s)", [request.FILES['image'].name, user, request.POST.get('title'), 0, 0])
@@ -77,7 +77,7 @@ def image(request):
             cursor.execute('SELECT comment, user FROM MyApp_comments WHERE image=%s', [image])
             comments = cursor.fetchall()
             all_comments.append(zip(list(map(lambda x: x[0], comments)), list(map(lambda x: x[1], comments))))
-        data['files_users'] = zip(list(map(lambda x: x[0], files)), list(map(lambda x: x[1], files)), list(map(lambda x: x[2], files)), list(map(lambda x: x[3], files)), list(map(lambda x: x[4], files)), list(map(lambda x: x[0], avatar)), all_comments)
+        data['files_users'] = zip(list(map(lambda x: 'images/' + x[0], files)), list(map(lambda x: x[1], files)), list(map(lambda x: x[2], files)), list(map(lambda x: x[3], files)), list(map(lambda x: x[4], files)), list(map(lambda x: 'avatars/' + x[0], avatar)), all_comments)
     return render(request, "image.html", context=data)
 # Create your views here.
 def your_images(request):
@@ -91,11 +91,10 @@ def your_images(request):
             img = request.POST.get("image")
             cursor.execute('SELECT DISTINCT name FROM MyApp_images WHERE title=%s', [img])
             name = cursor.fetchone()
-            print(name)
             cursor.execute("DELETE FROM MyApp_images WHERE title=%s", [img])
             cursor.execute("DELETE FROM MyApp_comments WHERE image=%s", [name[0]])
     with connection.cursor() as cursor:
         cursor.execute("SELECT DISTINCT name, title FROM MyApp_images WHERE user=%s", [user])
         images = cursor.fetchall()
-        data['files'] = zip(list(map(lambda x: x[0], images)), list(map(lambda x: x[1], images)))
+        data['files'] = zip(list(map(lambda x: 'images/' + x[0], images)), list(map(lambda x: x[1], images)))
     return render(request, 'your_images.html', context=data)

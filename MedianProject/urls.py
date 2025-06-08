@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.urls import path
 from MyApp import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('', views.index),
     path('registration/', views.registration),
     path('login/', views.login),
     path('image/', views.image),
     path('your_images/', views.your_images)
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
