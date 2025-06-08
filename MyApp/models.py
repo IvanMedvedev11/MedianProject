@@ -2,10 +2,10 @@ from django.db import models
 class Person(models.Model):
     login = models.CharField(max_length=20)
     password = models.CharField(max_length=1000)
-    avatar = models.CharField(max_length=100, null=True)
+    avatar = models.ImageField(upload_to="avatars/")
 # Create your models here.
 class Images(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.ImageField(upload_to="images/")
     user = models.CharField(max_length=20)
     title = models.CharField(max_length=100)
     likes = models.IntegerField(null=True)
