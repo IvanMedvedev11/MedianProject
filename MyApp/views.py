@@ -53,6 +53,7 @@ def image(request):
         return HttpResponseForbidden("Вы не авторизованы")
     data = {"files_users": []}
     if request.method == "POST":
+        print(request.POST)
         if request.POST.get("title"):
             fs = FileSystemStorage(location='media/images')
             filename = fs.save(request.FILES['image'].name, request.FILES['image'])
@@ -60,6 +61,7 @@ def image(request):
                 cursor.execute("INSERT INTO MyApp_images (name, user, title, likes, dislikes) VALUES(%s, %s, %s, %s, %s)", [request.FILES['image'].name, user, request.POST.get('title'), 0, 0])
         elif request.POST.get("like"):
             with connection.cursor() as cursor:
+                
                 cursor.execute("UPDATE MyApp_images SET likes = likes + 1 WHERE name=%s", [request.POST.get("name")])
         elif request.POST.get('dislike'):
             with connection.cursor() as cursor:
@@ -77,7 +79,7 @@ def image(request):
             cursor.execute('SELECT comment, user FROM MyApp_comments WHERE image=%s', [image])
             comments = cursor.fetchall()
             all_comments.append(zip(list(map(lambda x: x[0], comments)), list(map(lambda x: x[1], comments))))
-        data['files_users'] = zip(list(map(lambda x: 'images/' + x[0], files)), list(map(lambda x: x[1], files)), list(map(lambda x: x[2], files)), list(map(lambda x: x[3], files)), list(map(lambda x: x[4], files)), list(map(lambda x: 'avatars/' + x[0], avatar)), all_comments)
+        data['files_users'] = zip(list(map(lambda x: x[0], files)), list(map(lambda x: x[1], files)), list(map(lambda x: x[2], files)), list(map(lambda x: x[3], files)), list(map(lambda x: x[4], files)), list(map(lambda x: 'avatars/' + x[0], avatar)), all_comments)
     return render(request, "image.html", context=data)
 # Create your views here.
 def your_images(request):
